@@ -79,7 +79,7 @@ def scraping(driver, name, row):
         if not is_save:
             for key, value in nome_link_dict.items():
                 porcentagem = similaridade(name.upper(), key.upper())
-                if porcentagem > 80:
+                if porcentagem >= 80:
                     save(row, value, name)
                     print(f'%{porcentagem} de similaridade.')
                     break

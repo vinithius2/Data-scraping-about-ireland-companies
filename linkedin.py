@@ -50,7 +50,7 @@ def search(driver, name, row):
     try:
         input_search = driver.find_element_by_class_name('search-global-typeahead__input')
     except:
-        # Tela de validação do Linkedinm seja rápido rs...
+        # Tela de validação do Linkedin, seja rápido rs...
         sleep(25)
         input_search = driver.find_element_by_class_name('search-global-typeahead__input')
     input_search.clear()
@@ -66,8 +66,14 @@ def search(driver, name, row):
 def select_company(driver, name, row):
     html_page = driver.page_source
     soup = BeautifulSoup(html_page, 'html.parser')
+
     empresas = soup.findAll('span', {'class': ['entity-result__title-text']})
-    nome_link_dict = {item.text.strip().title(): item.contents[1].attrs['href'] for item in empresas}
+    setor = soup.findAll('div', {'class': ['entity-result__primary-subtitle']})
+
+    nome_link_dict = dict()
+    for item in zip(empresas, setor):
+        nome_link_dict[item[0].text.strip().title()] = [item[0].contents[1].attrs['href'], item[1].text.strip().split(" • ")[0]]
+
     nome_empresa = None
     is_true = False
 
@@ -80,18 +86,18 @@ def select_company(driver, name, row):
         if not is_true:
             for key, value in nome_link_dict.items():
                 porcentagem = similaridade(name.upper(), key.upper())
-                if porcentagem > 80:
+                if porcentagem >= 80:
                     nome_empresa = key.title()
                     print(f'[{row}] % {porcentagem} de similaridade.')
                     break
         if nome_empresa is not None:
-            url = nome_link_dict[nome_empresa]
-            driver.get(url)
-            get_information(driver, row, url, name)
+            url = nome_link_dict[nome_empresa][0]
+            setor = nome_link_dict[nome_empresa][1]
+            get_information(row, url, setor, name)
         else:
             print(f'[{row}] {name} - Não encontrado na busca')
     else:
-        print(f'[{row}] {name} - Não encontrado na busca')
+        print(f'[{row}] {name} - Não existe no Linkedin')
 
 
 def similaridade(name_xlsx, name_scraping):
@@ -100,18 +106,11 @@ def similaridade(name_xlsx, name_scraping):
     return round(porcentagem, 2)
 
 
-def get_information(driver, row, url_linkedin, name):
-    sleep(3)
-    html_page = driver.page_source
-    soup = BeautifulSoup(html_page, 'html.parser')
-    try:
-        tipo = soup.find('div', {'class': ['org-top-card-summary-info-list__info-item']}).text.strip()
-    except:
-        tipo = "Desconhecido"
-    sheet.cell(row=row, column=11).value = tipo
-    sheet.cell(row=row, column=12).value = url_linkedin
+def get_information(row, url, setor, name):
+    sheet.cell(row=row, column=11).value = setor
+    sheet.cell(row=row, column=12).value = url
     workbook.save(path)
-    print(f'[{row}] {name} - {tipo} - {url_linkedin}!')
+    print(f'[{row}] {name} - {setor} - {url}!')
 
 
 if __name__ == '__main__':
