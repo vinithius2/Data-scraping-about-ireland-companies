@@ -10,7 +10,7 @@ Sources:
 ![image](https://user-images.githubusercontent.com/7644485/133800380-88fe1a0a-65cc-4e47-a3c1-ac6d1ca4e11c.png)
 
 ## Terminal
-![image](https://user-images.githubusercontent.com/7644485/133800002-7aed420c-3d77-4166-9402-cd2eeedc491a.png)
+![image](https://user-images.githubusercontent.com/7644485/133799868-7d667e4a-1220-4700-aaba-5a61666580b6.gif)
 ## Browser
-![image](https://user-images.githubusercontent.com/7644485/133800020-51e01926-10e4-4cfc-8570-7025576a041e.png)
+![image](https://user-images.githubusercontent.com/7644485/133798389-a1d2b8ab-7e28-44b4-92c7-5eb1439cab36.gif)
 
