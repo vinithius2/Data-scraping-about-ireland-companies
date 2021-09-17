@@ -3,6 +3,7 @@ from time import sleep
 from bs4 import BeautifulSoup
 from openpyxl import load_workbook
 from selenium import webdriver
+from difflib import SequenceMatcher
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
@@ -35,7 +36,7 @@ def login(driver):
 
 def start(driver):
     iniciar = True
-    row = 1095
+    row = 5
     while iniciar:
         value = sheet.cell(row=row, column=1).value
         if value is not None:
@@ -68,29 +69,35 @@ def select_company(driver, name, row):
     empresas = soup.findAll('span', {'class': ['entity-result__title-text']})
     nome_link_dict = {item.text.strip().title(): item.contents[1].attrs['href'] for item in empresas}
     nome_empresa = None
-    name_title = name.title()
+    is_true = False
 
     if nome_link_dict:
         for key, value in nome_link_dict.items():
-            key_title = key.title()
-            if name_title == key_title:
-                nome_empresa = key_title
+            if name.upper() == key.upper():
+                nome_empresa = key.title()
+                is_true = True
                 break
-            elif name_title in key_title:
-                nome_link_dict[name_title] = nome_link_dict[key_title]
-                del nome_link_dict[key_title]
-                nome_empresa = name_title
-                break
-
+        if not is_true:
+            for key, value in nome_link_dict.items():
+                porcentagem = similaridade(name.upper(), key.upper())
+                if porcentagem > 80:
+                    nome_empresa = key.title()
+                    print(f'%{porcentagem} de similaridade.')
+                    break
         if nome_empresa is not None:
             url = nome_link_dict[nome_empresa]
             driver.get(url)
+            get_information(driver, row, url, name)
         else:
-            url = list(nome_link_dict.values())[0]
-            driver.get(url)
-        get_information(driver, row, url, name)
+            print(f'[{row}] {name} - Não encontrado na busca')
     else:
-        print(f'{name} - Não encontrado no Linkedin')
+        print(f'[{row}] {name} - Não encontrado na busca')
+
+
+def similaridade(name_xlsx, name_scraping):
+    seq = SequenceMatcher(None, name_xlsx, name_scraping)
+    porcentagem = seq.ratio() * 100
+    return round(porcentagem, 2)
 
 
 def get_information(driver, row, url_linkedin, name):
