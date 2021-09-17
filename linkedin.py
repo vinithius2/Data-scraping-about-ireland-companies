@@ -82,7 +82,7 @@ def select_company(driver, name, row):
                 porcentagem = similaridade(name.upper(), key.upper())
                 if porcentagem > 80:
                     nome_empresa = key.title()
-                    print(f'%{porcentagem} de similaridade.')
+                    print(f'[{row}] % {porcentagem} de similaridade.')
                     break
         if nome_empresa is not None:
             url = nome_link_dict[nome_empresa]
@@ -111,7 +111,7 @@ def get_information(driver, row, url_linkedin, name):
     sheet.cell(row=row, column=11).value = tipo
     sheet.cell(row=row, column=12).value = url_linkedin
     workbook.save(path)
-    print(f'{name} - {tipo} - {url_linkedin}')
+    print(f'[{row}] {name} - {tipo} - {url_linkedin}!')
 
 
 if __name__ == '__main__':
