@@ -1,5 +1,6 @@
 from time import sleep
 
+import requests
 from bs4 import BeautifulSoup
 from openpyxl import load_workbook
 from selenium import webdriver
@@ -36,7 +37,7 @@ def login(driver):
 
 def start(driver):
     iniciar = True
-    row = 5
+    row = 1754
     while iniciar:
         value = sheet.cell(row=row, column=1).value
         if value is not None:
@@ -49,7 +50,7 @@ def start(driver):
 def search(driver, name, row):
     try:
         input_search = driver.find_element_by_class_name('search-global-typeahead__input')
-    except:
+    except Exception as e:
         # Tela de validação do Linkedin, seja rápido rs...
         sleep(25)
         input_search = driver.find_element_by_class_name('search-global-typeahead__input')
@@ -59,7 +60,14 @@ def search(driver, name, row):
     sleep(3)
     url = driver.current_url
     url = url.replace("/search/results/all", "/search/results/companies")
-    driver.get(url)
+    try:
+        driver.get(url)
+    except requests.Timeout as err:
+        print("###### ERRO ######")
+        print(err)
+        print("##################")
+        driver.refresh()
+        search(driver, name, row + 1)
     select_company(driver, name, row)
 
 
