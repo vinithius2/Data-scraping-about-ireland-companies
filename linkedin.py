@@ -37,7 +37,7 @@ def login(driver):
 
 def start(driver):
     iniciar = True
-    row = 1754
+    row = 5
     while iniciar:
         value = sheet.cell(row=row, column=1).value
         if value is not None:
